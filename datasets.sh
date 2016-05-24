@@ -1,15 +1,6 @@
 # In this code i am downloading all miRNA files from ftp server of RNACentral database. 
 
 
-# I do not know why this is not working ? 
-# IFS="="
-# while read -r name value
-# do
-# 	value=${value//[[:space:]]}
-# echo "Content of $name is $value"
-# done < /home/jammy/miRNA_collection/configration.conf
-
-
 
 # This code is working nicely. Solution 1
 #https://lists.gnu.org/archive/html/help-bash/2013-05/msg00018.html
