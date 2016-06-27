@@ -2,7 +2,24 @@
 awk 'BEGIN{OFS="\t"} /^#/{next;} $3=="miRNA_primary_transcript" {split($9,id,";");sub(/ID=/,"",id[1]); print $1, $4-1, $5,id[1], "0", $7}' ath.gff3 > ath.bed
 
 #to convert the RNA_Central files gff3 files to bed files
-
-
+awk 'BEGIN{OFS="\t"}$3=="transcript" && $9~/type=miRNA$/{split($9,id,";");sub(/Name=/,"",id[2]); print "chr"$1,$4-1,$5,id[2],"0",$7}'
 
 # Steps to make bed tools intersect. 
+
+# to eliminate any sort of double entries in the file when they are concatenated together. 
+cat ~/datasets_new/mirBASE/hsa.bed ~/datasets_new/Rna_central_bed\ files/Homo_sapiens.GRCh38_v_1.bed | sort -u > concat_so-u_Arabidopsis_thaliana.TAIR10.bed
+
+# sort the bed files 
+sortBed -i concat_Arabidopsis_thaliana.TAIR10_v1.bed > sorted_Arabidopsis_thaliana.TAIR10.bed
+
+#merge the bed files
+mergeBed -i sorted_Arabidopsis_thaliana.TAIR10_v2.bed -s -c 4,5,6 -o collapse,median,mean  > merged_ath.bed 
+
+#intersect the bed files for RNA_Central 
+intersectBed -a mergedbed_Arabidopsis_thaliana.TAIR10.bed -b ~/datasets_new/Rna_central_bed\ files/Arabidopsis_thaliana.TAIR10_v1_tab.bed -c  | sort -u | cut -f5,8 > RNAcentral_intersect_Arabidopsis_thaliana.TAIR10.bed
+
+#intersect the bed file for mirBASE. 
+intersectBed -a mergedbed_Arabidopsis_thaliana.TAIR10.bed -b ~/datasets_new/mirBASE/ath.gff3 -c  | sort -u | cut -f5,8 > mirbase_intersect_Arabidopsis_thaliana.TAIR10.bed
+
+#Pasting both files for plotting the venn diagrams. 
+paste RNAcentral_intersect_Arabidopsis_thaliana.TAIR10.bed mirbase_intersect_Arabidopsis_thaliana.TAIR10.bed | cut -f 1,2,4 > final_venn_Arabidopsis_thaliana.TAIR10.bed
